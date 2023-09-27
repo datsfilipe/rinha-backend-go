@@ -1,11 +1,15 @@
 package handlers
 
-// import (
-// 	"encoding/json"
-// 
-// 	"github.com/datsfilipe/rinha-backend-go/pkg/database"
-// 	"github.com/datsfilipe/rinha-backend-go/pkg/models"
-// )
+import (
+	"encoding/json"
+	"fmt"
+	"log"
+
+	"github.com/datsfilipe/rinha-backend-go/pkg/database"
+	"github.com/datsfilipe/rinha-backend-go/pkg/models"
+	"github.com/google/uuid"
+)
+
 func serializeStringArray(array []string) any {
 	if len(array) == 0 {
 		return nil
@@ -29,22 +33,56 @@ func serializeStringArray(array []string) any {
 func CreatePersonHandler(request []byte) ([]byte, error) {
 	if len(request) == 0 {
 		return nil, nil
-	} else {
-		return request, nil
 	}
 
-	// var person models.Person
-	// err := json.Unmarshal(request, &person)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	//
-	// db, err := database.Open()
-	//
-	// db.Exec(
-	// 	"INSERT INTO people (nick, name, birth_date, stack) VALUES ($1, $2, $3, $4)",
-	// 	person.Nick, person.Name, person.BirthDate, person.Stack,
-	// )
-	//
-	// return []byte("Person created"), nil
+	var person models.Person
+	err := json.Unmarshal(request, &person)
+
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(person)
+
+	db, err := database.Open()
+
+	if err != nil {
+		return nil, err
+	}
+
+	repeatedNick, err := db.Query("SELECT nick FROM people WHERE nick = $1", person.Nick)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if repeatedNick.Next() {
+		return []byte("Nick already in use"), nil
+	}
+
+	people, err := db.Query("SELECT * FROM people")
+	if err == nil {
+		for people.Next() {
+			var person models.Person
+			err := people.Scan(&person.Nick, &person.Name, &person.BirthDate, &person.Stack)
+			if err != nil {
+				fmt.Println(err)
+				log.Println(err)
+			} else {
+				fmt.Println(person)
+				log.Println(person)
+			}
+		}
+	}
+
+	var _, err2 = db.Exec(
+		"INSERT INTO people (id, nick, name, birth_date, stack) VALUES ($1, $2, $3, $4, $5)",
+		uuid.New().String(), person.Nick, person.Name, person.BirthDate, serializeStringArray(person.Stack),
+	)
+
+	if err2 != nil {
+		return nil, err2
+	}
+
+	return []byte("Person created"), nil
 }
