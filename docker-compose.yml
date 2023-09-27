@@ -42,8 +42,14 @@ services:
           memory: '0.5GB'
 
   db: # Banco de dados
-   image: postgres
-   deploy:
+    image: postgres
+    volumes:
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    environment:
+      POSTGRES_USER: rinha
+      POSTGRES_PASSWORD: rinha
+      POSTGRES_DB: rinha
+    deploy:
       resources:
         limits:
           cpus: '0.75'
