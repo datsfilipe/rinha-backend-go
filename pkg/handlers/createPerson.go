@@ -6,6 +6,25 @@ package handlers
 // 	"github.com/datsfilipe/rinha-backend-go/pkg/database"
 // 	"github.com/datsfilipe/rinha-backend-go/pkg/models"
 // )
+func serializeStringArray(array []string) any {
+	if len(array) == 0 {
+		return nil
+	}
+
+	var serialized string
+	for i, item := range array {
+		if i == 0 {
+			serialized = "{" + item
+		} else {
+			serialized = serialized + "," + item
+		}
+
+		if i == len(array)-1 {
+			serialized = serialized + "}"
+		}
+	}
+	return serialized
+}
 
 func CreatePersonHandler(request []byte) ([]byte, error) {
 	if len(request) == 0 {
