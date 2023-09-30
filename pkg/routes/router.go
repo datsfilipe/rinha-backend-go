@@ -28,5 +28,13 @@ func SetupRouter() *gin.Engine {
 		c.String(http.StatusOK, string(response))
 	})
 
+	r.GET("/contagem-pessoas", func(c *gin.Context) {
+		response, err := handlers.CountPeopleHandler()
+		if err != nil {
+			c.String(http.StatusBadRequest, err.Error())
+		}
+		c.String(http.StatusOK, string(response))
+	})
+
 	return r
 }
