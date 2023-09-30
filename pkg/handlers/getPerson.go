@@ -2,25 +2,26 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/datsfilipe/rinha-backend-go/pkg/database"
-	"github.com/datsfilipe/rinha-backend-go/pkg/utils"
 	"github.com/datsfilipe/rinha-backend-go/pkg/models"
+	"github.com/datsfilipe/rinha-backend-go/pkg/utils"
 )
 
-func GetPersonHandler(id string) ([]byte, error) {
+func GetPersonHandler(id string) ([]byte, int, error) {
 	if len(id) == 0 {
-		return nil, nil
+		return nil, 400, errors.New("Invalid ID")
 	}
 
 	db, err := database.Open()
 	if err != nil {
-		return nil, err
+		return nil, 500, err
 	}
 
 	people, err := db.Query("SELECT * FROM people WHERE id = $1 LIMIT 1", id)
 	if err != nil {
-		return []byte("Error getting person"), err
+		return nil, 404, err
 	}
 
 	var person models.Person
@@ -34,7 +35,7 @@ func GetPersonHandler(id string) ([]byte, error) {
 
 		err = people.Scan(&id, &nick, &name, &birthDate, &stack, &search)
 		if err != nil {
-			return []byte("Error getting person 1"), err
+			return nil, 500, err
 		}
 
 		person = models.Person{
@@ -47,13 +48,13 @@ func GetPersonHandler(id string) ([]byte, error) {
 	}
 
 	if person.ID == "" {
-		return []byte("Person not found"), nil
+		return nil, 404, errors.New("Person not found")
 	}
 
 	response, err := json.Marshal(person)
 	if err != nil {
-		return []byte("Error getting person"), err
+		return nil, 500, err
 	}
 
-	return response, nil
+	return response, 200, nil
 }
