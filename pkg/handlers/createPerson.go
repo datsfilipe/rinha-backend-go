@@ -2,8 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
-	"log"
 
 	"github.com/datsfilipe/rinha-backend-go/pkg/database"
 	"github.com/datsfilipe/rinha-backend-go/pkg/models"
@@ -42,8 +40,6 @@ func CreatePersonHandler(request []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	fmt.Println(person)
-
 	db, err := database.Open()
 
 	if err != nil {
@@ -66,11 +62,7 @@ func CreatePersonHandler(request []byte) ([]byte, error) {
 			var person models.Person
 			err := people.Scan(&person.Nick, &person.Name, &person.BirthDate, &person.Stack)
 			if err != nil {
-				fmt.Println(err)
-				log.Println(err)
-			} else {
-				fmt.Println(person)
-				log.Println(person)
+				return nil, err
 			}
 		}
 	}
