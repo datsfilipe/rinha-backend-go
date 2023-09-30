@@ -2,26 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
-	"strings"
 
 	"github.com/datsfilipe/rinha-backend-go/pkg/database"
+	"github.com/datsfilipe/rinha-backend-go/pkg/utils"
 	"github.com/datsfilipe/rinha-backend-go/pkg/models"
 )
-
-func deserializeStringArray(rawSql []uint8) []string {
-	serialized := string(rawSql)
-
-    if serialized == "" || serialized == "nil" {
-        return nil
-    }
-
-    serialized = strings.Trim(serialized, "{}")
-
-    elements := strings.Split(serialized, ",")
-
-    return elements
-}
-
 
 func GetPersonHandler(id string) ([]byte, error) {
 	if len(id) == 0 {
@@ -56,7 +41,7 @@ func GetPersonHandler(id string) ([]byte, error) {
 			Nick:      nick,
 			Name:      name,
 			BirthDate: birthDate,
-			Stack:     deserializeStringArray(stack),
+			Stack:     utils.DeserializeStringArray(stack),
 		}
 	}
 
