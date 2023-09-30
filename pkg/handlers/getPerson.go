@@ -30,8 +30,9 @@ func GetPersonHandler(id string) ([]byte, error) {
 		var name string
 		var birthDate string
 		var stack []uint8
+		var search string
 
-		err = people.Scan(&id, &nick, &name, &birthDate, &stack)
+		err = people.Scan(&id, &nick, &name, &birthDate, &stack, &search)
 		if err != nil {
 			return []byte("Error getting person 1"), err
 		}
