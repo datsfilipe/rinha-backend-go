@@ -56,17 +56,6 @@ func CreatePersonHandler(request []byte) ([]byte, error) {
 		return []byte("Nick already in use"), nil
 	}
 
-	people, err := db.Query("SELECT * FROM people")
-	if err == nil {
-		for people.Next() {
-			var person models.Person
-			err := people.Scan(&person.Nick, &person.Name, &person.BirthDate, &person.Stack)
-			if err != nil {
-				return nil, err
-			}
-		}
-	}
-
 	var _, err2 = db.Exec(
 		"INSERT INTO people (id, nick, name, birth_date, stack) VALUES ($1, $2, $3, $4, $5)",
 		uuid.New().String(), person.Nick, person.Name, person.BirthDate, serializeStringArray(person.Stack),
