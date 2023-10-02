@@ -13,5 +13,8 @@ func Open() (*sql.DB, error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.SetMaxOpenConns(450)
+	db.SetMaxIdleConns(50)
+
 	return db, err
 }
