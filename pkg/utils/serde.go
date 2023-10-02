@@ -7,15 +7,15 @@ import (
 func DeserializeStringArray(rawSql []uint8) []string {
 	serialized := string(rawSql)
 
-    if serialized == "" || serialized == "nil" {
-        return nil
-    }
+	if serialized == "" || serialized == "nil" {
+		return nil
+	}
 
-    serialized = strings.Trim(serialized, "{}")
+	serialized = strings.Trim(serialized, "{}")
 
-    elements := strings.Split(serialized, ",")
+	elements := strings.Split(serialized, ",")
 
-    return elements
+	return elements
 }
 
 func SerializeStringArray(array []string) any {
