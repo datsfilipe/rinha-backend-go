@@ -1,27 +1,22 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 
-	"github.com/datsfilipe/rinha-backend-go/pkg/database"
 	"github.com/datsfilipe/rinha-backend-go/pkg/models"
 	"github.com/datsfilipe/rinha-backend-go/pkg/utils"
 )
 
-func GetPersonHandler(id string) ([]byte, int, error) {
-	if len(id) == 0 {
-		return nil, 400, errors.New("Invalid ID")
-	}
-
-	db, err := database.Open()
-	if err != nil {
-		return nil, 500, err
+func GetPersonHandler(db *sql.DB, id string) ([]byte, int, error) {
+	if !utils.ValidateUUID(id) {
+		return nil, 422, errors.New("Invalid ID")
 	}
 
 	people, err := db.Query("SELECT * FROM people WHERE id = $1 LIMIT 1", id)
 	if err != nil {
-		return nil, 404, err
+		return nil, 500, err
 	}
 
 	var person models.Person

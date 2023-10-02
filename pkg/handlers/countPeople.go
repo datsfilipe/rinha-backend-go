@@ -1,17 +1,11 @@
 package handlers
 
 import (
+	"database/sql"
 	"fmt"
-
-	"github.com/datsfilipe/rinha-backend-go/pkg/database"
 )
 
-func CountPeopleHandler() ([]byte, int, error) {
-	db, err := database.Open()
-	if err != nil {
-		return nil, 500, err
-	}
-
+func CountPeopleHandler(db *sql.DB) ([]byte, int, error) {
 	people, err := db.Query("SELECT * FROM people")
 	if err != nil {
 		return nil, 500, err

@@ -1,23 +1,18 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
-	"strings"
 	"errors"
+	"strings"
 
-	"github.com/datsfilipe/rinha-backend-go/pkg/database"
 	"github.com/datsfilipe/rinha-backend-go/pkg/models"
 	"github.com/datsfilipe/rinha-backend-go/pkg/utils"
 )
 
-func SearchByTermHandler(t string) ([]byte, int, error) {
-	if len(t) == 0 {
-		return nil, 400, errors.New("Invalid term")
-	}
-
-	db, err := database.Open()
-	if err != nil {
-		return nil, 500, err
+func SearchByTermHandler(db *sql.DB, t string) ([]byte, int, error) {
+	if !utils.ValidSearchTerm(t) {
+		return nil, 400, errors.New("Invalid search term")
 	}
 
 	people, err := db.Query("SELECT people, word_similarity($1, search) AS sml FROM people WHERE $1 <% search", t)
@@ -58,7 +53,7 @@ func SearchByTermHandler(t string) ([]byte, int, error) {
 	}
 
 	if len(peopleList) == 0 {
-		return nil, 404, errors.New("No people found")
+		return nil, 200, errors.New("No people found")
 	}
 
 	response, err := json.Marshal(peopleList)
